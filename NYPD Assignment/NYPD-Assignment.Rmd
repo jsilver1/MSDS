@@ -1,0 +1,108 @@
+---
+title: "Examining The Demographics of Shooting Incidents in NYC"
+author: "Jacob A. Silverstein"
+date: "Nov 12, 2021"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## NYPD Shooting Incidents
+
+Data taken from: *The City of New York* [*(Historic Data)*](https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD)
+
+Shooting incidents are all too common in the United States, and no city is immune to violent crime -- especially not the Big Apple. In order to better understand the demographics of gun violence in NYC, I have re-organized archived reports of shooting incidents throughout the city by various victim's data attributes including: `Borough`, `Race`, `Age` and `Sex`. Visualizations of these incidents allow us to explore and analyze some of the trends related to gun violence in NYC.
+
+```{r data_org, echo=FALSE}
+NYPD <- read.csv("./NYPD_Shooting_Incident_Data_Historic_(3).csv")
+NYPD_df <- data.frame(NYPD)
+NYPD_ft <- NYPD_df[, c(4,12,13,14)]
+colnames(NYPD_ft)[1] <- "Borough"
+colnames(NYPD_ft)[2] <- "Victim_Age"
+colnames(NYPD_ft)[3] <- "Victim_Sex"
+colnames(NYPD_ft)[4] <- "Victim_Race"
+# NYPD_ft
+```
+
+---
+
+#### Figure 1
+
+```{r fig_1, echo=FALSE}
+par(cex=0.7, mai=c(0.1,0.1,0.2,0.1))
+
+par(fig=c(0.1,0.7,0.3,0.9))
+counts <- table(NYPD_ft$Victim_Sex, NYPD_ft$Borough)
+barplot(counts, col=c("yellow","blue","grey"), legend=rownames(counts), cex.names=0.95)
+
+par(fig=c(0.7,1,0.25,1), new=TRUE)
+slices <- c(table(NYPD_ft$Victim_Sex))
+labels <- paste0(round(100 * slices/sum(slices), 2), "%")
+colors <- c("yellow", "blue", "grey")
+pie(slices, labels=labels, col=colors, edges=5, cex=0.85)
+
+mtext("Distribution of Gun Violence Victims by Borough and Gender", side=3, line=-2, outer=TRUE)
+mtext("Incidents", side=2, line=-2.5, adj=0.58, outer=TRUE)
+```
+
+Figure 1 shows us that most of all gun violence incidents in NYC are reported in the Bronx and Brooklyn boroughs. Additionally, nearly all of the victims identify as male, with females making up less than 10% of all victims. According to these reports, Staten Island is the safest borough to be in NYC. Interestingly, the only "unspecified" gender statistic that shows up is located in this borough, which prompts more questions about the Staten Island borough data. Further research could dive into this topic more deeply.
+
+---
+
+#### Figure 2
+
+```{r fig_2, echo=FALSE}
+data <- table(NYPD_ft$Victim_Age)
+plot(data, ylab="Incidents (modeled)", xlab="Age", type="o", col="darkorange", main="Distribution of Gun Violence Victims by Age", lwd=3, pch=20)
+```
+
+Figure 2 tells us that most gun violence victims in NYC are between the ages of 18 and 44. Interestingly, there are more victims that are less than 18 years old than there are victims that are greater than 45 years old. There are almost no victims older than 65. These data are slightly incomplete in that they do not include the victims' actual age - rather the categorization of age groups together. Some of these groups have large ranges (for example group 25-44), which leads to further questions such as at what age specifically does gun violence peak for victims. The orange line on the plot represents a model connecting the trends between each age group. This model likely does not reflect the actual trend for where gun violence peaks by age in actuality. These questions could be answered with further research.
+
+---
+
+#### Figure 3
+
+```{r fig_3, echo=FALSE}
+par(cex=0.7, mai=c(0.1,0.1,0.2,0.1))
+
+par(fig=c(0.1,0.7,0.3,0.9))
+races <- table(NYPD_ft$Victim_Race)
+barplot(races, col=c(rainbow(length(races))), legend=rownames(races), cex.names=.01)
+
+par(fig=c(0.7,1,0.25,1), new=TRUE)
+pizzas <- c(table(NYPD_ft$Victim_Race))
+lbs <- paste0(round(100 * pizzas/sum(pizzas), 2), "%")
+pie(pizzas, labels=lbs, col=c(rainbow(length(races))), edges=5, cex=1)
+
+mtext("Distribution of Gun Violence Victims by Race", side=3, line=-2, outer=TRUE)
+mtext("Race", side=3, line=-27, adj=0.39, outer=TRUE)
+mtext("Incidents", side=2, line=-2.5, adj=0.58, outer=TRUE)
+```
+
+Figure 3 shows us that a very large majority of gun violence victims are Black. According to the data, 71.48% of shooting victims since 2006 have been reported as Black in NYC, while another 9.52% were reported as Black/Hispanic. Together, that makes up 80% of all shooting victims. Less than 0.5% of victims were reported as White, while just under 15% were Hispanic or Hispanic/White. These numbers are quite significant, and much further research could be conducted to uncover some of the determinants of these trends.
+
+---
+
+### Conclusion
+
+In conclusion, reported gun violence incidents in New York City from 2006 until the present have hit some demographics much harder than others. Some of the most affected people are Black males between the ages of 18 and 40 living in Brooklyn and in the Bronx. On the other hand, some of the least affected people are white elderly females (65+) residing in the Staten Island borough. Interestingly, there are more Asian/Pacific Islanders reported gun violence incidents than there are White reported incidents, despite the fact that Asian/Pacific Islanders make up a significantly smaller proportion of the population when compared to Whites.
+
+##### Identifying Bias
+My personal bias relating to this project includes my race, gender and the neighborhood where I grew up in. I am a White male who grew up on the northwest side of Chicago, and although I did not grow up in NYC, the gun violence demographics are similar across the nation - especially in Chicago with young Black males on the southwest side making up a largely significant portion of victims. I tried very hard to not bring race into the picture with this project since it is already so largely talked about, but I found that it was actually a very significant aspect of this data set. I had the intention of looking at other aspects of gun violence, but the distribution of incidents by race is perhaps the most important aspect because it so unevenly affects people of color.
+
+---
+
+#### Table 1
+(Showing only the first 10 rows)
+```{r tab_1, echo=FALSE}
+head(NYPD_ft, 10)
+```
+
+```{r session_info, echo=FALSE}
+sessionInfo()
+```
